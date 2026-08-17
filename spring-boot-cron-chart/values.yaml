@@ -12,28 +12,31 @@ activeDeadlineSeconds: 300 # Terminate the container forcefully if stuck over 5 
 
 # Container Engine Blueprint
 image:
-  repository: ://your-registry.com
-  tag: "1.0.0"
-  pullPolicy: IfNotPresent
+  repository: health-hazard-events
+  tag: latest
+  pullPolicy: Never
 
 # Structural Resource Allocation Profiles
-resources:
-  requests:
-    cpu: "250m"
-    memory: "256Mi"
-  limits:
-    cpu: "500m"
-    memory: "512Mi"
+#resources:
+#  requests:
+#    cpu: "250m"
+#    memory: "256Mi"
+#  limits:
+#    cpu: "500m"
+#    memory: "512Mi"
 
 # Application Environment Variables for Spring Boot 4 relaxed binding
 env:
-  springProfile: "prod"
+  springProfile: "default"
   kafkaBootstrapServers: "prod-kafka-cluster.infra.svc.cluster.local:9092"
   kafkaRetries: "5"
   kafkaMaxBlockMs: "5000"
   kafkaDeliveryTimeoutMs: "15000"
 
 # Node Placement and Security Profiles
-nodeSelector: {}
-tolerations: []
-affinity: {}
+#nodeSelector: {}
+#tolerations: []
+#affinity: {}
+
+apiKeys:
+  thirdPartyKey: ""

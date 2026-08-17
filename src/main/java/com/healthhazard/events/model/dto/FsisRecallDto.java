@@ -8,7 +8,7 @@ import java.util.List;
 
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record FsisRecallDto(
+public record FsisRecallDto (
         @JsonProperty("field_title") String title,
         @JsonProperty("field_recall_number") String recallNumber,
         @JsonProperty("field_recall_number_export") String recallNumberExport,

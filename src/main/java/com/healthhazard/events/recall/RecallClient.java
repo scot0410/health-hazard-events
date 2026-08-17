@@ -2,12 +2,12 @@ package com.healthhazard.events.recall;
 
 import com.healthhazard.events.client.FdaHttpClient;
 import com.healthhazard.events.client.FsisHttpClient;
-import com.healthhazard.events.client.RecallClientPort;
 import com.healthhazard.events.model.FoodRecall;
 import com.healthhazard.events.model.ProductDescription;
 import com.healthhazard.events.model.dto.FdaRecallDto;
 import com.healthhazard.events.model.dto.FdaRecallResponseDto;
 import com.healthhazard.events.model.dto.FsisRecallDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -20,14 +20,10 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Component
-public class RecallClient implements RecallClientPort {
+@RequiredArgsConstructor
+public class RecallClient implements ExternalApiClient {
     private final FdaHttpClient fdaHttpClient;
     private final FsisHttpClient fsisHttpClient;
-
-    public RecallClient(FdaHttpClient fdaHttpClient, FsisHttpClient fsisHttpClient) {
-        this.fdaHttpClient = fdaHttpClient;
-        this.fsisHttpClient = fsisHttpClient;
-    }
 
     @Override
     public List<FoodRecall> fetchLatestRecalls() {

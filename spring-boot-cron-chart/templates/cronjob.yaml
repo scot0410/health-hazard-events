@@ -35,9 +35,12 @@ spec:
                 capabilities:
                   drop:
                     - ALL
-              resources:
-                {{- toYaml .Values.resources | nindent 14 }}
               env:
+                - name: FDA_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: events-secrets
+                      key: THIRD_PARTY_API_KEY
                 - name: SPRING_PROFILES_ACTIVE
                   value: {{ .Values.env.springProfile | quote }}
                 - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
@@ -47,9 +50,3 @@ spec:
                 - name: SPRING_KAFKA_PRODUCER_PROPERTIES_DELIVERY_TIMEOUT_MS
                   value: {{ .Values.env.kafkaDeliveryTimeoutMs | quote }}
           restartPolicy: OnFailure
-          nodeSelector:
-            {{- toYaml .Values.nodeSelector | nindent 12 }}
-          tolerations:
-            {{- toYaml .Values.tolerations | nindent 12 }}
-          affinity:
-            {{- toYaml .Values.affinity | nindent 12 }}

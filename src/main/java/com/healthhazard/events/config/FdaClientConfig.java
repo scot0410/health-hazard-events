@@ -11,8 +11,8 @@ public class FdaClientConfig {
     private String apiKey;
 
     @Bean
-    public RestClient fdaClient() {
-        return RestClient.builder()
+    public RestClient fdaClient(RestClient.Builder builder) {
+        return builder
                 .baseUrl("https://api.fda.gov/")
                 .defaultHeaders(httpHeaders -> httpHeaders.setBasicAuth(apiKey, ""))
                 .build();

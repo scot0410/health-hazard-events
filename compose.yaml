@@ -1,1 +1,54 @@
-services: {}
+services:
+  kafka:
+    image: apache/kafka:latest
+    container_name: local-kraft-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@localhost:9093'
+      # CRITICAL CHANGE: Added 'CLIENT' to allow internal communication inside the Docker network
+      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:9092,CLIENT://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://localhost:9092,CLIENT://kafka:29092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,CLIENT:PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: local-kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: 'local-cluster'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka:29092' # Uses internal network port
+    depends_on:
+      - kafka
+
+#  health-hazard-events:
+#    image: data-sync-cron:1.0.0
+#    container_name: local-data-sync-runner
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    environment:
+#      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+      # Instructs Spring Boot to load specific profiles if needed
+#      - SPRING_PROFILES_ACTIVE=dev
+
+      # Overrides your CustomKafkaProperties bean or app.properties map cleanly
+#      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:29092
+#      - SPRING_KAFKA_PRODUCER_PROPERTIES_MAX_BLOCK_MS=5000
+#      - SPRING_KAFKA_PRODUCER_PROPERTIES_DELIVERY_TIMEOUT_MS=10000
+#
+#      # Place your RestClient external configuration placeholders here
+#      - EXTERNAL_API_BASE_URL=https://mockclient.com
+#      - EXTERNAL_API_TOKEN=local-dev-token-xyz123
+#    depends_on:
+#      kafka:
+#        condition: service_started # Waits for Kafka to spin up before executing your batch

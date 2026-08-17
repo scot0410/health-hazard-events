@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class EventsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EventsApplication.class, args);
+		var appContext = SpringApplication.run(EventsApplication.class, args);
+		System.exit(SpringApplication.exit(appContext));
 	}
 
 }
