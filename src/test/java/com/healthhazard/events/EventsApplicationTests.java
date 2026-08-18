@@ -12,7 +12,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 class EventsApplicationTests {
 
 	@Test
-	void contextLoads() {
-	}
+	void contextLoads() {}
 
 }

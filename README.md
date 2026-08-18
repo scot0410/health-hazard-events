@@ -1,5 +1,10 @@
 # health-hazard-events
 
+
+local dev
+docker-compose up
+build via intellij
+
 1. start minikube
    minikube start
 2. kubectl cluster-info
