@@ -2,6 +2,7 @@ package com.healthhazard.events.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record FsisRecallDto (
         @JsonProperty("field_title") String title,
-        @JsonProperty("field_recall_number") String recallNumber,
+        @JsonProperty("field_recall_number") @NotBlank(message = "Recall number is mandatory") String recallNumber,
         @JsonProperty("field_recall_number_export") String recallNumberExport,
         @JsonProperty("field_recall_url") String recallUrl,
         @JsonProperty("field_active_notice") String activeNotice, // Populates "True"/"False" strings

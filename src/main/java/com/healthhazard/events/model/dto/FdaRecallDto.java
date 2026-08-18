@@ -3,11 +3,12 @@ package com.healthhazard.events.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record FdaRecallDto(
+public record FdaRecallDto (
     @JsonProperty("address_1") String address1,
     @JsonProperty("address_2") String address2,
     @JsonProperty("center_classification_date") String centerClassificationDate,
@@ -24,9 +25,9 @@ public record FdaRecallDto(
     @JsonProperty("product_code") String productCode,
     @JsonProperty("product_description") String productDescription,
     @JsonProperty("product_quantity") String productQuantity,
-    @JsonProperty("reason_for_recall") String reasonForRecall,
+    @JsonProperty("reason_for_recall")   String reasonForRecall,
     @JsonProperty("recall_initiation_date") String recallInitiationDate,
-    @JsonProperty("recall_number") String recallNumber,
+    @JsonProperty("recall_number") @NotBlank(message = "Recall number is mandatory") String recallNumber,
     @JsonProperty("recalling_firm") String recallingFirm,
     @JsonProperty("report_date") String reportDate,
     @JsonProperty("state") String state,

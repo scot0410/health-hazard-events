@@ -2,6 +2,7 @@ package com.healthhazard.events.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import lombok.Builder;
 
 import java.util.List;
@@ -10,4 +11,4 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record FdaRecallResponseDto (
         @JsonProperty("meta") Meta meta,
-        @JsonProperty("results") List<FdaRecallDto> results) {}
+        @JsonProperty("results") List<@Valid FdaRecallDto> results) {}

@@ -7,6 +7,7 @@ import com.healthhazard.events.model.ProductDescription;
 import com.healthhazard.events.model.dto.FdaRecallDto;
 import com.healthhazard.events.model.dto.FdaRecallResponseDto;
 import com.healthhazard.events.model.dto.FsisRecallDto;
+import com.healthhazard.events.model.dto.FsisRecallResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -15,7 +16,9 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -31,16 +34,16 @@ public class RecallClient implements ExternalApiClient {
                 .orElseGet(() -> FdaRecallResponseDto.builder().build());
 
         var fsisRecallData = Optional.ofNullable(fsisHttpClient.fetchRecallData())
-                .orElseGet(() -> List.of(FsisRecallDto.builder().build()));
+                .orElseGet(() -> FsisRecallResponseDto.builder().build());
 
-        return buildFoodRecall(fdaRecallData.results(), fsisRecallData);
+        return buildFoodRecall(fdaRecallData.results(), fsisRecallData.fsisRecalls());
     }
 
     private static List<FoodRecall> buildFoodRecall(List<FdaRecallDto> fdaRecallDtos,
                                                     List<FsisRecallDto> fsisRecallDtos) {
 
-        var fdaRecalls = fdaRecallDtos.stream().map(RecallClient::fdaRecallMapper).toList();
-        var fsisRecalls = fsisRecallDtos.stream().map(RecallClient::fsisRecallMapper).toList();
+        var fdaRecalls = safeMapToDto(fdaRecallDtos, RecallClient::fdaRecallMapper, "FDA");
+        var fsisRecalls = safeMapToDto(fsisRecallDtos, RecallClient::fsisRecallMapper, "USDA");
         return Stream.concat(fdaRecalls.stream(), fsisRecalls.stream()).toList();
     }
 
@@ -74,8 +77,12 @@ public class RecallClient implements ExternalApiClient {
     }
 
     private static FoodRecall fsisRecallMapper(FsisRecallDto fsisRecallDto) {
-        var simpleLocation = String.join(", ", fsisRecallDto.states());
-        var reason = String.join(", ", fsisRecallDto.recallReason());
+        var simpleLocation = fsisRecallDto.states() != null
+                ? String.join(", ", fsisRecallDto.states())
+                : "Unknown";
+        var reason = fsisRecallDto.recallReason() != null
+                ? String.join(", ", fsisRecallDto.recallReason())
+                : "Unknown";
 
         var productDescription = collectProductDescription(fsisRecallDto);
         return FoodRecall.builder()
@@ -112,5 +119,21 @@ public class RecallClient implements ExternalApiClient {
                 .productName(String.join(", ", fsisRecallDto.productItems()))
                 .identifiers(fsisRecallDto.productItems())
                 .build();
+    }
+
+    private static <T> List<FoodRecall> safeMapToDto(List<T> dtoList,
+                                                     Function<T, FoodRecall> mapper,
+                                                     String agencyName) {
+        return Optional.ofNullable(dtoList).orElse(List.of())
+                .stream()
+                .map(dto -> {
+                    try {
+                        return mapper.apply(dto);
+                    } catch (RuntimeException ex) {
+                        log.error("Failed to map {} recall record. Skipping item.", agencyName, ex);
+                        return null;
+                    }})
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

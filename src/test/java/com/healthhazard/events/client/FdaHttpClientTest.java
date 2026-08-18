@@ -5,10 +5,12 @@ import com.healthhazard.events.exception.ClientErrorException;
 import com.healthhazard.events.model.dto.FdaRecallDto;
 import com.healthhazard.events.model.dto.FdaRecallResponseDto;
 import com.healthhazard.events.model.dto.Meta;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.restclient.test.autoconfigure.RestClientTest;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -24,19 +26,22 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
 @RestClientTest(FdaHttpClient.class)
-@Import(FdaClientConfig.class)
+@Import({FdaClientConfig.class, ValidationAutoConfiguration.class})
 public class FdaHttpClientTest {
     @Autowired
-    FdaHttpClient client;
+    private Validator validator;
 
     @Autowired
-    MockRestServiceServer mockServer;
+    private FdaHttpClient client;
+
+    @Autowired
+    private MockRestServiceServer mockServer;
 
     @Test
     @DisplayName("Should successfully fetch and deserialize FDA data to FdaRecallResponseDto")
     void fetchOngoingRecallDataShouldFetchAndDeserializeFDAData() {
 
-        var fdaRecallResponseDto = getFdaRecallResponseDtoString();
+        var fdaRecallResponseDto = getFdaRecallResponseDtoString("TEST-123");
 
         mockServer
                 .expect(requestTo(containsString("/food/enforcement.json/?search=")))
@@ -68,12 +73,28 @@ public class FdaHttpClientTest {
         assertThat(msg.getMessage(), is("Client error on FDA call: 500 INTERNAL_SERVER_ERROR, "));
     }
 
-    private static String getFdaRecallResponseDtoString() {
+    @Test
+    @DisplayName("Should throw error on validation constraints")
+    void fetchOngoingRecallThrowErrorOnValidationConstraints() {
+        var fdaRecallResponseDto = getFdaRecallResponseDtoString(null);
+
+        mockServer
+                .expect(requestTo(containsString("/food/enforcement.json/?search=")))
+                .andRespond(
+                        withSuccess(fdaRecallResponseDto, MediaType.APPLICATION_JSON));
+
+        var msg = assertThrows(ClientErrorException.class, () -> client.fetchOngoingRecallData());
+        assertThat(msg.getMessage(), containsString("Validation failed for FDA payload. Violations [[ConstraintViolationImpl{interpolatedMessage='Recall number is mandatory'"));
+    }
+
+    private static String getFdaRecallResponseDtoString(String recallNumber) {
         try {
             var meta = Meta.builder()
                     .build();
 
-            var fdaRecallDto = FdaRecallDto.builder().build();
+            var fdaRecallDto = FdaRecallDto.builder()
+                    .recallNumber(recallNumber)
+                    .build();
 
             var fdaRecallResponseDto = FdaRecallResponseDto.builder()
                     .meta(meta)

@@ -11,15 +11,14 @@ import java.net.http.HttpClient;
 public class FsisClientConfig {
 
     @Bean
-    public RestClient fsisClient() {
-
+    public RestClient fsisClient(RestClient.Builder builder) {
         HttpClient httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_2)
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
         String browserUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
-        return RestClient.builder()
+        return builder
                 .baseUrl("https://www.fsis.usda.gov")
                 .requestFactory(new JdkClientHttpRequestFactory(httpClient)) // Inject browser-behaving client
                 // Mirror your working browser's exact fingerprint headers
