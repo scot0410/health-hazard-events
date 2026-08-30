@@ -25,7 +25,7 @@ public record FdaRecallDto (
     @JsonProperty("product_code") String productCode,
     @JsonProperty("product_description") String productDescription,
     @JsonProperty("product_quantity") String productQuantity,
-    @JsonProperty("reason_for_recall")   String reasonForRecall,
+    @JsonProperty("reason_for_recall") String reasonForRecall,
     @JsonProperty("recall_initiation_date") String recallInitiationDate,
     @JsonProperty("recall_number") @NotBlank(message = "Recall number is mandatory") String recallNumber,
     @JsonProperty("recalling_firm") String recallingFirm,

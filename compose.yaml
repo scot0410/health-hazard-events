@@ -1,36 +1,63 @@
+version: '3.8'
+
+networks:
+  platform-net:
+    name: platform-net
+
 services:
   kafka:
-    image: apache/kafka:latest
-    container_name: local-kraft-kafka
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
     ports:
       - "9092:9092"
     environment:
+      # Instructs the broker to handle its own controller cluster metadata logic
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: 'broker,controller'
-      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@localhost:9093'
-      # CRITICAL CHANGE: Added 'CLIENT' to allow internal communication inside the Docker network
-      KAFKA_LISTENERS: 'PLAINTEXT://0.0.0.0:9092,CLIENT://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093'
-      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://localhost:9092,CLIENT://kafka:29092'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,CLIENT:PLAINTEXT'
-      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:29093'
 
+      # Setup Listener Interfaces (Spring Boot on host uses 9092, Internal UI uses 29092)
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+
+      # Generate a mock unique cluster identity marker for formatting state
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - platform-net
+
+  # 2. Visual Message Log Web Console (Upturned for KRaft targets)
   kafka-ui:
-    image: provectuslabs/kafka-ui:latest
-    container_name: local-kafka-ui
+    image: ghcr.io/kafbat/kafka-ui:latest
+    container_name: kafka-ui
+    depends_on:
+      - kafka
     ports:
       - "8080:8080"
     environment:
       DYNAMIC_CONFIG_ENABLED: 'true'
-      KAFKA_CLUSTERS_0_NAME: 'local-cluster'
-      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka:29092' # Uses internal network port
-    depends_on:
-      - kafka
+      KAFKA_CLUSTERS_0_NAME: local-kraft-sandbox
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    networks:
+      - platform-net
 
-#  health-hazard-events:
+  # 3. Your Local AWS Serverless Target
+  localstack:
+    image: localstack/localstack:4.4.0
+    container_name: localstack
+    ports:
+      - "4566:4566"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - platform-net
+
+
+      #  health-hazard-events:
 #    image: data-sync-cron:1.0.0
 #    container_name: local-data-sync-runner
 #    build:

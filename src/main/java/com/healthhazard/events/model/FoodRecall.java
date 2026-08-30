@@ -10,7 +10,7 @@ public record FoodRecall (
         @NonNull String recallNumber,
         String recallingFirm,
         ProductDescription productDescription,
-        String reasonForRecall,
+        String recallReason,
         String classification,
         String status,
         LocalDate parsedDate,
