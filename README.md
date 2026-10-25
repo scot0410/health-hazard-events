@@ -1,75 +1,20 @@
 # health-hazard-events
 
-
-local dev
-docker-compose up
-build via intellij
-
-1. start minikube
-   minikube start
-2. kubectl cluster-info
-# This should cleanly display your Minikube control plane network coordinates
-kubectl cluster-info
-
-# Ensure you see your node reporting a "Ready" state
-kubectl get nodes
+https://www.fsis.usda.gov/fsis/api/recall/v/1Your 
+Category: This API covers Meat, Poultry, and Egg products.
+Data Type: Live, real-time JSON event feed. [1] (https://www.fsis.usda.gov/science-data/developer-resources/recall-api), [2] (https://play.google.com/store/apps/details?id=com.centerforrecallsafety.recallsentry), [3] (https://datadashboard.fda.gov/oii/cd/recalls.htm), [4] (https://www.fsis.usda.gov/science-data/developer-resources/recall-api)
 
 
+https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/food-safety-recalls/rss.xml
+https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/recalls/rss.xml
+Category: The specific /food-safety-recalls/rss.xml subpath handles Food and Pet Food managed by the FDA, 
+the parent directory provides access to the master feed /recalls/rss.xml. 
+The master feed provides live real-time XML data on all FDA-regulated items, which includes:General Food & Produce (vegetables, dairy, seafood, etc.)Human & Animal DrugsCosmeticsMedical Devices & Tobacco
 
+Data Type: Live, real-time news stream (limited to the most recent 10–15 records).
 
-
-# 1. Build your Spring application fat jar
-./gradlew clean bootJar
-
-# 2. Build the app image and spin up the entire cluster simultaneously
-docker compose up --build
-
-# 3. Tear down the environment when you are done testing
-docker compose down
-
-----
-
-# 1. Lint and validate the templates using both configuration files
-helm lint ./spring-boot-cron-chart -f ./spring-boot-cron-chart/values.yaml -f ./spring-boot-cron-chart/value-secrets.yaml
-
-# 2. Render and debug the compiled manifest to make sure it looks right
-helm template my-release ./spring-boot-cron-chart -f ./spring-boot-cron-chart/values.yaml -f ./spring-boot-cron-chart/value-secrets.yaml --debug
-
-# 3. Deploy the application package to your cluster
-helm upgrade --install data-sync-pipeline ./spring-boot-cron-chart --namespace local --create-namespace -f ./spring-boot-cron-chart/values.yaml -f ./spring-boot-cron-chart/value-secrets.yaml
-
-helm upgrade --install health-hazard-tracker-local ./charts -n local --set apiKeys.thirdPartyKey="$(grep FDA_API_KEY .env | cut -d '=' -f2)"
-OR
-helm upgrade health-hazard-tracker-local ./charts -n local --reuse-values
-
-
-# 4. Trigger an immediate execution manually to verify end-to-end functionality
-kubectl create job --from=cronjob/data-sync-pipeline-sync-job manual-test-run -n local
-
-
-
-┌────────────────────────────────────────────────────────────────────────┐
-│                          YOUR WORKSTATION                              │
-│                                                                        │
-│  [ ENVIRONMENT A: Local Compose ]      [ ENVIRONMENT B: Kubernetes ]   │
-│  ┌─────────────────────────────┐      ┌─────────────────────────────┐  │
-│  │   docker compose up         │      │  kubectl create job         │  │
-│  │  ┌───────────────────────┐  │      │  ┌───────────────────────┐  │  │
-│  │  │ Spring Boot (Local)   │  │      │  │ Spring Boot (In Pod)  │  │  │
-│  │  └───────────────────────┘  │      │  └───────────────────────┘  │  │
-│  └──────────────┬──────────────┘      └──────────────┬──────────────┘  │
-│                 │ (Connects to)                      │ (Connects to)   │
-│                 ▼                                    ▼                 │
-│         ┌──────────────┐                     ┌──────────────┐          │
-│         │ Kafka Broker │                     │ Kafka Broker │          │
-│         └──────────────┘                     └──────────────┘          │
-└────────────────────────────────────────────────────────────────────────┘
-
-[Main Thread] ──► Packs RAM Buffer
-│
-[Sender Thread] ──(Groups into compressed batches)──► Ships via TCP
-│
-[Kafka Broker]
-(Writes to Disk)
-│
-[Atomic Counters] ◄── [Thread Pool Pool] ◄──(Fires independent Acks)─────┘
+https://fda.gov
+https://api.fda.gov/food/enforcement.json/?search={search}
+Category: Gets historic info related to food recalls.
+This is the official openFDA database. It tracks the comprehensive historical archive of food recalls dating back decades. It updates weekly and has a processing lag, making it perfect for seeding a database but unsuitable for real-time alerts. 
+(Note: If you want historical Drug or Cosmetic data, you change /food/ in the URL path to /drug/ or /cosmetic/)

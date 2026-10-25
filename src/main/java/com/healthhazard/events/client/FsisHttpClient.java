@@ -1,8 +1,8 @@
 package com.healthhazard.events.client;
 
 import com.healthhazard.events.exception.ClientErrorException;
-import com.healthhazard.events.model.dto.FsisRecallDto;
-import com.healthhazard.events.model.dto.FsisRecallResponseDto;
+import com.healthhazard.events.model.dto.usda.FsisRecallDto;
+import com.healthhazard.events.model.dto.usda.FsisRecallResponseDto;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

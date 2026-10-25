@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class RecallService {
     private final ExternalApiClient externalApiClient;
-    private final MessagePublisher messagePublisher;
+    private final MessagePublisher publisher;
 
     public void processRecalls() {
-        messagePublisher.publish(externalApiClient.fetchLatestRecalls());
+        publisher.publishEvents(externalApiClient.fetchLatestRecalls());
     }
 }

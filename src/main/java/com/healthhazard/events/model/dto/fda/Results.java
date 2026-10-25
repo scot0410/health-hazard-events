@@ -1,4 +1,4 @@
-package com.healthhazard.events.model.dto;
+package com.healthhazard.events.model.dto.fda;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

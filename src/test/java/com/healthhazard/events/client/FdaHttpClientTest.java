@@ -2,9 +2,9 @@ package com.healthhazard.events.client;
 
 import com.healthhazard.events.config.FdaClientConfig;
 import com.healthhazard.events.exception.ClientErrorException;
-import com.healthhazard.events.model.dto.FdaRecallDto;
-import com.healthhazard.events.model.dto.FdaRecallResponseDto;
-import com.healthhazard.events.model.dto.Meta;
+import com.healthhazard.events.model.dto.fda.FdaRecallDto;
+import com.healthhazard.events.model.dto.fda.FdaRecallResponseDto;
+import com.healthhazard.events.model.dto.fda.Meta;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ public class FdaHttpClientTest {
                 .andRespond(
                         withSuccess(fdaRecallResponseDto, MediaType.APPLICATION_JSON));
 
-        var result = client.fetchOngoingRecallData();
+        var result = client.fetchHistoricRecallData();
         assertThat(result, is(notNullValue()));
     }
 
@@ -58,7 +58,7 @@ public class FdaHttpClientTest {
         mockServer
                 .expect(requestTo(containsString("/food/enforcement.json/?search=")))
                 .andRespond(withBadRequest());
-        var msg = assertThrows(ClientErrorException.class, () -> client.fetchOngoingRecallData());
+        var msg = assertThrows(ClientErrorException.class, () -> client.fetchHistoricRecallData());
         assertThat(msg.getMessage(), is("Client error on FDA call: 400 BAD_REQUEST, "));
     }
 
@@ -68,7 +68,7 @@ public class FdaHttpClientTest {
         mockServer
                 .expect(requestTo(containsString("/food/enforcement.json/?search=")))
                 .andRespond(withServerError());
-        var msg = assertThrows(ClientErrorException.class, () -> client.fetchOngoingRecallData());
+        var msg = assertThrows(ClientErrorException.class, () -> client.fetchHistoricRecallData());
 
         assertThat(msg.getMessage(), is("Client error on FDA call: 500 INTERNAL_SERVER_ERROR, "));
     }
@@ -83,7 +83,7 @@ public class FdaHttpClientTest {
                 .andRespond(
                         withSuccess(fdaRecallResponseDto, MediaType.APPLICATION_JSON));
 
-        var msg = assertThrows(ClientErrorException.class, () -> client.fetchOngoingRecallData());
+        var msg = assertThrows(ClientErrorException.class, () -> client.fetchHistoricRecallData());
         assertThat(msg.getMessage(), containsString("Validation failed for FDA payload. Violations [[ConstraintViolationImpl{interpolatedMessage='Recall number is mandatory'"));
     }
 

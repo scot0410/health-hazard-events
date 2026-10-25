@@ -1,6 +1,6 @@
 package com.healthhazard.events.recall;
 
-import com.healthhazard.events.model.FoodRecall;
+import com.healthhazard.events.model.dto.FoodRecall;
 
 import java.util.List;
 

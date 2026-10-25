@@ -1,4 +1,4 @@
-package com.healthhazard.events.model;
+package com.healthhazard.events.model.dto;
 
 import lombok.Builder;
 
