@@ -1,7 +1,7 @@
 package com.healthhazard.events.client;
 
 import com.healthhazard.events.exception.ClientErrorException;
-import com.healthhazard.events.model.dto.FsisRecallDto;
+import com.healthhazard.events.model.dto.usda.FsisRecallDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

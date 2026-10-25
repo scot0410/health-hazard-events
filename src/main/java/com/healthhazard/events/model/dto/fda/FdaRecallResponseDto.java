@@ -1,4 +1,4 @@
-package com.healthhazard.events.model.dto;
+package com.healthhazard.events.model.dto.fda;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,5 +9,6 @@ import java.util.List;
 
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record FsisRecallResponseDto (
-        List<@Valid FsisRecallDto> fsisRecalls) {}
+public record FdaRecallResponseDto (
+        @JsonProperty("meta") Meta meta,
+        @JsonProperty("results") List<@Valid FdaRecallDto> results) {}

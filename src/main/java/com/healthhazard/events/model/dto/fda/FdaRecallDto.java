@@ -1,8 +1,9 @@
-package com.healthhazard.events.model.dto;
+package com.healthhazard.events.model.dto.fda;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.healthhazard.events.model.dto.enums.ProductType;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 

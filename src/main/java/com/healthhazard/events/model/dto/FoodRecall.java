@@ -1,20 +1,19 @@
-package com.healthhazard.events.model;
+package com.healthhazard.events.model.dto;
 
 import lombok.Builder;
 import lombok.NonNull;
 
-import java.time.LocalDate;
-
 @Builder
 public record FoodRecall (
+        @NonNull String eventId,
         @NonNull String recallNumber,
         String recallingFirm,
         ProductDescription productDescription,
         String recallReason,
         String classification,
         String status,
-        LocalDate parsedDate,
+        String parsedDate,
         String distLocation,
-        String sourceAgency,
+        @NonNull String sourceAgency,
         String infoUrl
 ) {}

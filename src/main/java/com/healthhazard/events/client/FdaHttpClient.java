@@ -1,10 +1,9 @@
 package com.healthhazard.events.client;
 
 import com.healthhazard.events.exception.ClientErrorException;
-import com.healthhazard.events.model.dto.FdaRecallResponseDto;
+import com.healthhazard.events.model.dto.fda.FdaRecallResponseDto;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -16,7 +15,7 @@ public class FdaHttpClient {
     private final RestClient fdaClient;
     private final Validator validator;
 
-    public FdaRecallResponseDto fetchOngoingRecallData() {
+    public FdaRecallResponseDto fetchHistoricRecallData() {
         var pathogens = "listeria salmonella toxoplasma brucella";
 
         String searchQuery = String.format(

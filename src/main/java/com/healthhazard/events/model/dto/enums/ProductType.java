@@ -1,4 +1,4 @@
-package com.healthhazard.events.model.dto;
+package com.healthhazard.events.model.dto.enums;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
